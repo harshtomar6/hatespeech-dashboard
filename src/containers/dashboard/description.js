@@ -1,6 +1,39 @@
-import React from 'react'
-import { Heading,Endpoint,Method,Url,Headers,Body,Response} from './../../components';
+import React, {Fragment} from 'react'
+import { Heading,Endpoint,Method,Url,Headers,Body,Response, Input, Button} from './../../components';
+import { BASE_URI } from '../../globals';
 export default class Description extends React.Component {
+
+  state = {
+    key: '',
+    text: '',
+    res: null
+  }
+
+  handleSubmit = async e => {
+    e.preventDefault();
+
+    try{
+      const resObj = await fetch(BASE_URI+'/app/evaluate', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Key': this.state.key,
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
+        },
+        body: JSON.stringify({ text: this.state.text })
+      });
+
+      const res = await resObj.json();
+
+      if(res.err)
+        return alert(res.err.toString());
+
+      this.setState({res: JSON.stringify(res.data)})
+    } catch (err){
+      alert(err.toString())
+    } 
+  }
+
   render(){
     return (
     <div>
@@ -32,6 +65,24 @@ export default class Description extends React.Component {
           5. Send <em>/registerUser APPKEY</em> as a private message to bot.<br/>
           6. Send <em>/registerGroup APPKEY</em> from the group.
       </p> */}
+
+      <h3>Test Now</h3>
+      <p>You can test this API by filling out the fields below</p>
+
+      <form onSubmit={this.handleSubmit}>
+        <Input id="key" type="text"  placeholder="API KEY" value={this.state.key} 
+          onChange={e => this.setState({ key: e.target.value })} required />
+        <Input id="text" type="text" placeholder="Text" value={this.state.text} 
+          onChange={e => this.setState({ text: e.target.value })} required />
+        <Button type="submit" style={{float: 'right', width: 'auto'}}>Test Now</Button>
+      </form>
+
+      {this.state.res &&
+        <Fragment>
+          <h3>Response</h3>
+          <p>{this.state.res}</p>
+        </Fragment>
+      }
 
     </div>)
   }
