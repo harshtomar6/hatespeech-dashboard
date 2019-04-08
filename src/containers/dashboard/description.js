@@ -28,7 +28,8 @@ export default class Description extends React.Component {
       if(res.err)
         return alert(res.err.toString());
 
-      this.setState({res: JSON.stringify(res.data)})
+      this.setState({res: res.data})
+
     } catch (err){
       alert(err.toString())
     } 
@@ -80,7 +81,9 @@ export default class Description extends React.Component {
       {this.state.res &&
         <Fragment>
           <h3>Response</h3>
-          <p>{this.state.res}</p>
+          <p>{this.state.res.map(item => 
+            <span>{Object.keys(item)[0]+' : '+ item[Object.keys(item)[0]]}</span>  
+          )}</p>
         </Fragment>
       }
 
